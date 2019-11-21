@@ -238,7 +238,6 @@ export class NgxGauge implements AfterViewInit, OnChanges, OnDestroy {
 
                     start = inactiveArcEnd;
                 } else {
-                  console.log('not in the split arc');
                     let arcColor = (startPercentage >= valuePercent) ? fallbackColor : color;
                     let end = start + (arcLength * percentageToTravel);
                     this._drawArc(start, end, arcColor);
@@ -349,7 +348,6 @@ export class NgxGauge implements AfterViewInit, OnChanges, OnDestroy {
             let previousProgress = ov ? (ov - min) * unit : 0;
             let middle = start + previousProgress + displacement * progress;
 
-            console.log('drawing shell with start: ' + start + ', middle: ' + middle + ', tail: ' + tail);
             self._drawShell(start, middle, tail, color);
             if (self._animationRequestID && (runtime < duration)) {
                 self._animationRequestID = window.requestAnimationFrame((timestamp) => animate(timestamp));
