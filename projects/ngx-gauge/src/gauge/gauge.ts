@@ -190,7 +190,7 @@ export class NgxGauge implements AfterViewInit, OnChanges, OnDestroy {
 
     private _drawShell(start: number, middle: number, tail: number, color: string) {
         if (this.preserveThresholds) {
-            this._drawShellWithSegments(start, tail);
+            this._drawShellWithSegments(start, middle, tail);
             return;
         }
 
@@ -213,10 +213,11 @@ export class NgxGauge implements AfterViewInit, OnChanges, OnDestroy {
         }
     }
 
-    private _drawShellWithSegments(start: number, tail: number) {
+    private _drawShellWithSegments(start: number, currentValue: number, tail: number) {
         if (this.thresholds && this._initialized) {
             let percentages = Object.keys(this.thresholds),
-                arcLength = tail - start;
+                arcLength = tail - start,
+                valuePercent = (currentValue - start) / arcLength;
 
             this._clear();
 
@@ -224,7 +225,6 @@ export class NgxGauge implements AfterViewInit, OnChanges, OnDestroy {
                 let startPercentage = (Number(percentages[i]) / 100),
                     nextPercentage = (Number(percentages[i + 1]) / 100) || 1,
                     percentageToTravel = (nextPercentage - startPercentage),
-                    valuePercent = this.value / 100,
                     color = this.thresholds[percentages[i]].color,
                     fallbackColor = this.thresholds[percentages[i]].fallbackColor || this.backgroundColor;
 
@@ -238,6 +238,7 @@ export class NgxGauge implements AfterViewInit, OnChanges, OnDestroy {
 
                     start = inactiveArcEnd;
                 } else {
+                  console.log('not in the split arc');
                     let arcColor = (startPercentage >= valuePercent) ? fallbackColor : color;
                     let end = start + (arcLength * percentageToTravel);
                     this._drawArc(start, end, arcColor);
@@ -254,7 +255,7 @@ export class NgxGauge implements AfterViewInit, OnChanges, OnDestroy {
         this._context.beginPath();
         this._context.strokeStyle = color;
         this._context.arc(center.x, center.y, radius, start, end, false);
-        this._context.stroke();    
+        this._context.stroke();
     }
 
     private _clear() {
@@ -348,6 +349,7 @@ export class NgxGauge implements AfterViewInit, OnChanges, OnDestroy {
             let previousProgress = ov ? (ov - min) * unit : 0;
             let middle = start + previousProgress + displacement * progress;
 
+            console.log('drawing shell with start: ' + start + ', middle: ' + middle + ', tail: ' + tail);
             self._drawShell(start, middle, tail, color);
             if (self._animationRequestID && (runtime < duration)) {
                 self._animationRequestID = window.requestAnimationFrame((timestamp) => animate(timestamp));
